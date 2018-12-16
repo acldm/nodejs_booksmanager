@@ -14,7 +14,8 @@ function VaildStringLength(name, max_len) {
 exports.Create = function * (req, res) {
     const body = req.body
     const vaildBookData = {
-        bID: Vaild.StringLength("图书号", 30),
+        bID: [Vaild.StringLength("图书号", 30), 
+                Vaild.SQLCheckExists('select * from books where bID = ?', [body.bID],"图书号已存在!")],
         bName: Vaild.StringLength("图书名", 30),
         bPub: Vaild.StringLength("出版社名称",30),
         bAuthor: Vaild.StringLength("作者名字",20),
@@ -22,8 +23,7 @@ exports.Create = function * (req, res) {
         bCnt: Vaild.TypeCons("数量", Type.Number)
     }
     data = Vaild.vaild(body, vaildBookData)
-    let rows = co(yield db.execSQL("select * from books",[]));
-	console.log(rows)
+    //let rows = co(yield db.execSQL("select * from books",[]));
     //error==0:通过验证
     if (data.error == 0) {
         //构建sql语句
@@ -31,10 +31,4 @@ exports.Create = function * (req, res) {
     } else {
         return HTM(data.status_code, data.error)
     }
-    // for (key in body) {
-    //     if (key in vaildBookData
-    //         && !vaildBookData[key].vaild(body[key])) {
-    //             return HTM(1, vaildBookData[key].error)
-    //     }
-    // }
 }

@@ -1,8 +1,28 @@
+const db=require("./coSqlite3")
+const co = require("co")
+
 exports.StringLength = function (name, max_len) {
     return {
         vaild: s => s.length <= max_len,
         error: `${name}不得超过${max_len}个字符`,
         status_code: 1,
+    }
+}
+
+exports.SQLCheckExists = function(sql, sql_args, error) {
+    return {
+        vaild: function() {
+            co(function* () {
+                let rows = yield db.execSQL(sql,sql_args)
+                return rows
+            }).then(rows => {
+                console.log(rows)
+                if (rows.length > 0) return true
+                else return false
+            })
+        },
+        error: error,
+        status_code: 2
     }
 }
 
