@@ -1,5 +1,8 @@
 const db=require("../coSqlite3")
 const HTM=require('../lib').html;
+const Vaild = require('../vaild')
+const Type = require('../vaild').Type
+const co = require("co")
 
 function VaildStringLength(name, max_len) {
     return {
@@ -11,20 +14,27 @@ function VaildStringLength(name, max_len) {
 exports.Create = function * (req, res) {
     const body = req.body
     const vaildBookData = {
-        bID: VaildStringLength("图书号", 30),
-        bName: VaildStringLength("图书名", 30),
-        bPub: VaildStringLength("出版社名称",30),
-        bAuthor: VaildStringLength("作者名字",20),
-        bMem: VaildStringLength("内容摘要",30),
+        bID: Vaild.StringLength("图书号", 30),
+        bName: Vaild.StringLength("图书名", 30),
+        bPub: Vaild.StringLength("出版社名称",30),
+        bAuthor: Vaild.StringLength("作者名字",20),
+        bMem: Vaild.StringLength("内容摘要",30),
+        bCnt: Vaild.TypeCons("数量", Type.Number)
     }
-    for (key in vaildBookData) {
-        console.log(vaildBookData[key].error)
+    data = Vaild.vaild(body, vaildBookData)
+    let rows = co(yield db.execSQL("select * from books",[]));
+	console.log(rows)
+    //error==0:通过验证
+    if (data.error == 0) {
+        //构建sql语句
+        return HTM(0, "注册成功!")
+    } else {
+        return HTM(data.status_code, data.error)
     }
-    for (key in body) {
-        if (key in vaildBookData
-            && !vaildBookData[key].vaild(body[key])) {
-                return HTM(1, vaildBookData[key].error)
-        }
-    }
-    return HTM(0, "注册成功!")
+    // for (key in body) {
+    //     if (key in vaildBookData
+    //         && !vaildBookData[key].vaild(body[key])) {
+    //             return HTM(1, vaildBookData[key].error)
+    //     }
+    // }
 }

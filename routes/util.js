@@ -4,7 +4,7 @@ const HTM=require('../lib').html;
 
 exports.CreateTable = function*(req, res) {
     yield db.execSQL(`CREATE TABLE books (
-        id integer primary_key auto increment,
+        id integer primary key autoincrement,
         bID varchar(30) NOT NULL UNIQUE,
         bName varchar(30) NOT NULL,
         bPub varchar(30) NOT NULL,
