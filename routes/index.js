@@ -4,3 +4,4 @@ const app=require('../WebApp');
 
 app.route('/create-db', 'post', util.CreateTable)
 app.route('/books/create', 'post', book.Create)
+app.route('/books/inc', 'post', book.addBookCnt)
